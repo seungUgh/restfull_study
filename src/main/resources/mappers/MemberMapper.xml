@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="restfull_study.mapper.MemberMapper">
+	<sql id="selectSQL">
+		SELECT ID, EMAIL, PASSWORD, NAME, REGDATE FROM MEMBER
+	</sql>
+	
+	<sql id="whereSQL">
+		<where>
+			<if test="id != null">
+				ID = #{id}
+			</if>		
+		</where>
+	</sql>
+	
+	<sql id="setSQL">
+		<set>
+			<if test="password != null">password = #{password},</if>
+			<if test="name != null">name = #{name},</if>
+			<if test="email != null">email =#{email},</if>
+		</set>
+	</sql>
+	<resultMap type="Member" id="resMember">
+		<result column="REGDATE" property="registerDateTime" typeHandler="org.apache.ibatis.type.LocalDateTimeTypeHandler"/>
+	</resultMap>
+	
+	
+	<select id="selectMemberByAll" resultMap="resMember">
+		<include refid="selectSQL"></include>
+	</select>
+	
+	<select id="selectMemberById" resultMap="resMember">
+		<include refid="selectSQL"></include>
+		<include refid="whereSQL"></include>
+	</select>	
+		
+	<insert id="insertMember" parameterType="Member">
+		<selectKey keyProperty="id" order="BEFORE" resultType="long">
+			SELECT MEMBER_ID_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+			INSERT INTO MEMBER (ID, EMAIL, PASSWORD, NAME, REGDATE)
+			VALUES(#{id},#{email},#{password},#{name}, sysdate)
+	</insert>	
+	
+	<delete id="deleteMember">
+		DELETE FROM MEMBER
+		<include refid="whereSQL"></include>
+	</delete>
+	
+	<update id="updateMember">
+		UPDATE MEMBER
+		<include refid="setSQL"></include>
+		<include refid="whereSQL"></include>
+	</update>
+	
+</mapper>
